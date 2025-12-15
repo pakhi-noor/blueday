@@ -1,3 +1,12 @@
+# 🌊 BlueDay
+
+✨ **Stay in flow. Plan your day. Focus better.**
+
+🔗 https://blueday-app.vercel.app/
+
+
+
+
 OpsHub
 OpsHub is a personal operations dashboard designed to help users manage tasks, deadlines, and daily planning with light AI assistance. It combines a clean task manager, calendar view, notes, and AI-powered insights into a single focused workspace.
 This project was built as a portfolio-grade full-stack application with an emphasis on usability, thoughtful AI integration, and clean architecture.
