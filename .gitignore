@@ -1,0 +1,23 @@
+# Node
+node_modules/
+
+# Environment variables
+.env
+.env.local
+
+# Database / local data
+tasks.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Build outputs
+dist/
+build/
+
+# Vite cache
+.vite/
+
+# OS / editor files
+.DS_Store
+.vscode/
