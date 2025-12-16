@@ -377,7 +377,7 @@ function App() {
 
 
   const fetchTasks = async (selectedFilter = filter) => {
-    let url = "http://localhost:3001/tasks";
+    let url = `${API_BASE}/tasks`;
 
     if (selectedFilter === "pending") {
       url += "?status=pending";
@@ -391,13 +391,19 @@ function App() {
   };
 
 
+
   const createTask = async (e) => {
     e.preventDefault();
 
     await fetch(`${API_BASE}/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, priority, dueDate }),
+      body: JSON.stringify({
+        title,
+        priority,
+        dueDate: dueDate || null,
+      }),
+
     });
 
     setTitle("");
@@ -425,12 +431,13 @@ function App() {
   };
   // toggle if the completed to active and vice versa
   const toggleTask = async (id) => {
-    await fetch(`http://localhost:3001/tasks/${id}/toggle`, {
+    await fetch(`${API_BASE}/tasks/${id}/toggle`, {
       method: "PATCH",
     });
 
     fetchTasks();
   };
+
 
 
   // Derived task views for filters
