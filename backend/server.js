@@ -3,7 +3,7 @@ dotenv.config();
 
 import express from "express";
 import cors from "cors";
-import OpenAI from "openai";
+//import OpenAI from "openai";
 import { db } from "./db/database.js";
 
 
@@ -19,9 +19,9 @@ app.use(express.json());
  * AI
  */
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+//const openai = new OpenAI({
+ // apiKey: process.env.OPENAI_API_KEY,
+//});
 
 app.post("/plan", async (req, res) => {
   const { tasks } = req.body;
@@ -43,10 +43,10 @@ Tasks:
 ${taskList}
 `;
 
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [{ role: "user", content: prompt }],
-  });
+  //const completion = await openai.chat.completions.create({
+   // model: "gpt-4o-mini",
+  //  messages: [{ role: "user", content: prompt }],
+ // });
 
   res.json({
     plan: completion.choices[0].message.content,
