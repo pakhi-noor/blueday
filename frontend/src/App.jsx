@@ -492,9 +492,9 @@ from-pastel-sky via-white to-pastel-mint
               </div>
             )}
             {/* Header */}
-            <div className="grid grid-cols-3 items-center mb-6">
+            <div className="flex flex-col gap-4 sm:grid sm:grid-cols-3 sm:items-center mb-6">
               {/* LEFT */}
-              <div className="justify-self-start">
+              <div className="flex gap-2 justify-center sm:justify-self-start">
                 <button
                   onClick={() => setDarkMode(!darkMode)}
                   className="px-3 py-1 rounded-lg bg-gray-200 dark:bg-gray-700 
@@ -532,7 +532,7 @@ from-pastel-sky via-white to-pastel-mint
               </div>
 
               {/* CENTER */}
-              <div className="text-center">
+              <div className="text-center order-first sm:order-none">
                 <h1
                   className="
         text-4xl font-bold
@@ -555,7 +555,7 @@ from-pastel-sky via-white to-pastel-mint
               </div>
 
               {/* RIGHT */}
-              <div className="flex gap-2 justify-self-end">
+              <div className="flex gap-2 justify-center sm:justify-self-end">
                 <button
                   onClick={() => setCalendarOpen(true)}
                   className="
