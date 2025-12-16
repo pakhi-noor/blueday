@@ -286,6 +286,10 @@ const priorityOrder = {
 //Add sound cue
 const ding = new Audio("/ding.mp3");
 
+const API_BASE =
+  import.meta.env.VITE_API_URL || "http://localhost:3001";
+
+
 
 function App() {
   const [tasks, setTasks] = useState([]);
@@ -390,7 +394,7 @@ function App() {
   const createTask = async (e) => {
     e.preventDefault();
 
-    await fetch("http://localhost:3001/tasks", {
+    await fetch(`${API_BASE}/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title, priority, dueDate }),
