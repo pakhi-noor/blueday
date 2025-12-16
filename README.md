@@ -10,7 +10,7 @@
 
 BlueDay is a lightweight, full-stack personal productivity application designed to help users organize tasks, manage priorities, and stay focused throughout the day.
 
-The project emphasizes simplicity, usability, and clean architecture, while demonstrating real-world full-stack development and deployment practices — without relying on paid services or external APIs.
+The project emphasizes simplicity, usability, and clean architecture, while demonstrating real-world full-stack development and deployment practices without relying on paid services or external APIs.
 
 ---
 
