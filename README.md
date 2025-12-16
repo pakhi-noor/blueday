@@ -1,4 +1,12 @@
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://blueday-app.vercel.app/)
+[![React](https://img.shields.io/badge/Frontend-React-blue)](https://react.dev/)
+[![Node.js](https://img.shields.io/badge/Backend-Node.js-green)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/API-Express-lightgrey)](https://expressjs.com/)
+[![SQLite](https://img.shields.io/badge/Database-SQLite-blue)](https://www.sqlite.org/)
+[![Vercel](https://img.shields.io/badge/Deployed-Vercel-black)](https://vercel.com/)
+
 # 🌊 BlueDay
+
 ✨ **Stay in flow. Plan your day. Focus better.**
 
 🔗 **Live Demo:** https://blueday-app.vercel.app/   
