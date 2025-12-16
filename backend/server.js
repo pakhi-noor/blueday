@@ -87,6 +87,21 @@ app.post("/tasks", (req, res) => {
   res.status(201).json(task);
 });
 
+//delete Task
+app.delete("/tasks/:id", (req, res) => {
+  const { id } = req.params;
+
+  const query = "DELETE FROM tasks WHERE id = ?";
+
+  db.run(query, [id], function (err) {
+    if (err) {
+      return res.status(500).json({ error: "Failed to delete task" });
+    }
+
+    res.json({ message: "Task deleted successfully" });
+  });
+});
+
 
 // Get all tasks
 app.get("/tasks", (req, res) => {

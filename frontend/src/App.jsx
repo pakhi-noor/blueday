@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+
 
 // -----------------------------
 // Mock AI: Insight bar
@@ -166,7 +167,15 @@ function getStartDayOfMonth(year, month) {
 
 
 // Reusable component for displaying a single task card
-function TaskItem({ task, onToggle, aiBreakdowns, setAiBreakdowns, highlight }) {
+function TaskItem({
+  task,
+  onToggle,
+  onDelete,
+  aiBreakdowns,
+  setAiBreakdowns,
+  highlight,
+}) {
+
   return (
     <div
       onClick={() => onToggle(task.id)}
@@ -210,67 +219,97 @@ function TaskItem({ task, onToggle, aiBreakdowns, setAiBreakdowns, highlight }) 
             <h3 className={task.completed ? "line-through text-gray-400" : ""}>
               {task.title}
             </h3>
-            {/* Due date */}
-            {task.dueDate && (
-              <p className="text-xs text-gray-500 mt-0.5">
-                📅 Due: {formatDueDateForUI(task.dueDate)}
-              </p>
-            )}
 
-            {/* Priority badge*/}
-            <span
-              className={`text-xs px-2 py-1 rounded-full font-medium
+            <div className="flex items-center gap-2">
+              {/* Priority badge */}
+              <span
+                className={`text-xs px-2 py-1 rounded-full font-medium
     ${task.priority === "high"
-                  ? "bg-red-100 text-red-700"
-                  : task.priority === "medium"
-                    ? "bg-yellow-100 text-yellow-700"
-                    : "bg-blue-100 text-blue-700"
-                }
+                    ? "bg-red-100 text-red-700"
+                    : task.priority === "medium"
+                      ? "bg-yellow-100 text-yellow-700"
+                      : "bg-blue-100 text-blue-700"
+                  }
   `}
-            >
-              {task.priority}
-            </span>
+              >
+                {task.priority}
+              </span>
 
+
+              {/* Delete button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation(); // IMPORTANT: prevent toggle
+                  onDelete(task);
+                }}
+                className="text-red-500 hover:text-red-700 text-sm"
+                title="Delete task"
+              >
+                🗑️
+              </button>
+            </div>
           </div>
 
-          {/* AI Breakdown button */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation(); // do not complete task
-
-              // Toggle AI breakdown for this task
-              setAiBreakdowns((prev) => {
-                if (prev[task.id]) {
-                  // If already open → close it
-                  const copy = { ...prev };
-                  delete copy[task.id];
-                  return copy;
-                }
-
-                // Generate mock AI breakdown
-                return {
-                  ...prev,
-                  [task.id]: generateSubtasksFromTitle(task.title),
-                };
-              });
-            }}
-            className="mt-1 text-xs text-blue-600 hover:underline"
-          >
-            🤖 {aiBreakdowns[task.id] ? "Hide steps" : "Break into steps"}
-          </button>
-
-          {/* AI Breakdown display */}
-          {aiBreakdowns[task.id] && (
-            <ul className="mt-2 ml-4 list-disc text-sm text-gray-600 dark:text-gray-300">
-              {aiBreakdowns[task.id].map((step, index) => (
-                <li key={index}>{step}</li>
-              ))}
-            </ul>
+          {/* Due date */}
+          {task.dueDate && (
+            <p className="text-xs text-gray-500 mt-0.5">
+              📅 Due: {formatDueDateForUI(task.dueDate)}
+            </p>
           )}
+
+          {/* Priority badge*/}
+          <span
+            className={`text-xs px-2 py-1 rounded-full font-medium
+    ${task.priority === "high"
+                ? "bg-red-100 text-red-700"
+                : task.priority === "medium"
+                  ? "bg-yellow-100 text-yellow-700"
+                  : "bg-blue-100 text-blue-700"
+              }
+  `}
+          >
+            {task.priority}
+          </span>
 
         </div>
 
+        {/* AI Breakdown button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation(); // do not complete task
+
+            // Toggle AI breakdown for this task
+            setAiBreakdowns((prev) => {
+              if (prev[task.id]) {
+                // If already open → close it
+                const copy = { ...prev };
+                delete copy[task.id];
+                return copy;
+              }
+
+              // Generate mock AI breakdown
+              return {
+                ...prev,
+                [task.id]: generateSubtasksFromTitle(task.title),
+              };
+            });
+          }}
+          className="mt-1 text-xs text-blue-600 hover:underline"
+        >
+          🤖 {aiBreakdowns[task.id] ? "Hide steps" : "Break into steps"}
+        </button>
+
+        {/* AI Breakdown display */}
+        {aiBreakdowns[task.id] && (
+          <ul className="mt-2 ml-4 list-disc text-sm text-gray-600 dark:text-gray-300">
+            {aiBreakdowns[task.id].map((step, index) => (
+              <li key={index}>{step}</li>
+            ))}
+          </ul>
+        )}
+
       </div>
+
     </div>
   );
 }
@@ -318,6 +357,10 @@ function App() {
   // idle | focus | break
   const [mode, setMode] = useState("idle");
   const [secondsLeft, setSecondsLeft] = useState(0);
+  //delete/undo
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const deleteTimerRef = useRef(null);
+
 
   //Pomodoro
   useEffect(() => {
@@ -437,6 +480,42 @@ function App() {
 
     fetchTasks();
   };
+  //delete Task
+  const deleteTask = (task) => {
+    // Remove from UI immediately
+    setTasks((prev) => prev.filter((t) => t.id !== task.id));
+
+    // Store deleted task for undo
+    setPendingDelete(task);
+    setToast("🗑️ Task deleted");
+
+    // Start countdown before permanent delete
+    deleteTimerRef.current = setTimeout(async () => {
+      await fetch(`${API_BASE}/tasks/${task.id}`, {
+        method: "DELETE",
+      });
+
+      setPendingDelete(null);
+    }, 5000); // 5-second undo window
+  };
+
+  //undo delete
+  const undoDelete = async () => {
+    if (!pendingDelete) return;
+
+    clearTimeout(deleteTimerRef.current);
+
+    // Restore task in UI
+    setTasks((prev) => [pendingDelete, ...prev]);
+
+    setPendingDelete(null);
+    setToast("↩️ Delete undone");
+
+    setTimeout(() => setToast(""), 2000);
+  };
+
+
+
 
 
 
@@ -470,11 +549,22 @@ from-pastel-sky via-white to-pastel-mint
 
             {toast && (
               <div className="fixed top-6 right-6 z-50
-        bg-blue-600 text-white px-4 py-2 rounded-lg
-        shadow-lg">
-                {toast}
+    bg-blue-600 text-white px-4 py-2 rounded-lg
+    shadow-lg flex items-center gap-3">
+
+                <span>{toast}</span>
+
+                {pendingDelete && (
+                  <button
+                    onClick={undoDelete}
+                    className="underline font-medium hover:text-gray-200"
+                  >
+                    Undo
+                  </button>
+                )}
               </div>
             )}
+
 
             {/* Header */}
 
@@ -753,6 +843,7 @@ from-pastel-sky via-white to-pastel-mint
                           key={task.id}
                           task={task}
                           onToggle={toggleTask}
+                          onDelete={deleteTask}
                           aiBreakdowns={aiBreakdowns}
                           setAiBreakdowns={setAiBreakdowns}
                           highlight={animateNewTask && index === 0}
@@ -778,6 +869,7 @@ from-pastel-sky via-white to-pastel-mint
                         key={task.id}
                         task={task}
                         onToggle={toggleTask}
+                        onDelete={deleteTask}
                         aiBreakdowns={aiBreakdowns}
                         setAiBreakdowns={setAiBreakdowns}
                       />
@@ -802,6 +894,7 @@ from-pastel-sky via-white to-pastel-mint
                         key={task.id}
                         task={task}
                         onToggle={toggleTask}
+                        onDelete={deleteTask}
                         aiBreakdowns={aiBreakdowns}
                         setAiBreakdowns={setAiBreakdowns}
                         highlight={animateNewTask && index === 0}
@@ -823,6 +916,7 @@ from-pastel-sky via-white to-pastel-mint
                           key={task.id}
                           task={task}
                           onToggle={toggleTask}
+                          onDelete={deleteTask}
                           aiBreakdowns={aiBreakdowns}
                           setAiBreakdowns={setAiBreakdowns}
                         />
