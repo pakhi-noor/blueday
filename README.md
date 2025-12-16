@@ -1,8 +1,10 @@
 # 🌊 BlueDay
-### A Lightweight Personal Productivity Web App
-👤 Author: Scharara Islam
+✨ **Stay in flow. Plan your day. Focus better.**
 
 🔗 **Live Demo:** https://blueday-app.vercel.app/   
+
+👤 Author: Scharara Islam
+
 
 ---
 
